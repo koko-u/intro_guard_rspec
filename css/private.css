@@ -1,0 +1,42 @@
+p {
+  font-size: 125%;
+}
+p.author {
+  font-weight: bold;
+  font-size: xx-large;
+  font-family: cursive;
+  text-align: center;
+  margin-top: 300px;
+}
+
+p.date {
+  font-weight: normal;
+  font-size: x-large;
+  font-family: monospace;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.box {
+  font-size: 125%;
+  border: solid 1px gray;
+  padding: 5px;
+  margin-right: 20px;
+  background-color: #306;
+  color: #fff;
+}
+
+dl {
+  margin-bottom: 24px;
+}
+dl dt, dl dd {
+  line-height: 24px;
+}
+
+dl dt {
+  font-weight: bold;
+}
+dl dd {
+  margn-left: 18px;
+  text-indent: 1em;
+}
