@@ -56,9 +56,9 @@
         <li>名前     : 小崎 玄顕 (こざき つねあき)</li>
         <li>ついった : <a href="https://twitter.com/#!/koko_u">@koko_u</a></li>
         <li>職業     : SIer, COBOL-er, Excel-er, いろいろ…</li>
-        <li>趣味     : 読書、音楽、プログラミング</li>
-        <li>興味(ソフトウェア) Ruby, Rails, Scala, Play!, ...</li>
-        <li>興味(ハードウェア) Sony Reader, Android, ThinkPad, Happy Hacking Keyboard, ...</li>
+        <li>趣味     : 読書(読むだけ)、音楽(聞くだけ)、プログラミング(パクるだけ)</li>
+        <li>興味(soft): Ruby, Rails, Scala, Play!, ...</li>
+        <li>興味(hard): Sony Reader, Android, ThinkPad, Happy Hacking Keyboard, ...</li>
       </ul>
     </div>
 
@@ -71,10 +71,78 @@
     </div>
 
     <div class="slide">
-      <h2>なぜ Guard + Spork なのか？</h2>
+      <h2>アンケート</h2>
       <ul>
-        <li class="incremental">特に深い理由はありません。たまたまです</li>
+        <li class="incremental">guard を知っている？</li>
+        <li class="incremental">spork を知っている？</li>
       </ul>
+    </div>
+
+    <div class="slide">
+      <h2>そもそもなぜテストが必要なのか？</h2>
+    </div>
+    
+    <div class="slide">
+      <h2>実行しないと正しいことを確かめられないからですね</h2>
+    </div>
+    
+    <div class="slide">
+      <h2>例えば...</h2>
+      <pre class="brush: ruby">
+        # wrong_hello.rb
+        def wrong_hello(name)
+          if name.nil?
+            puts "you are nil boy"
+          elseif name.empty?
+            puts "you are empty girl"
+          else
+            puts "hello #{name}"
+          end
+        end
+      </pre>
+    </div>
+
+    <div class="slide">
+      <h2>普段は何ごともなく動く</h2>
+      <pre class="brush: ruby">
+        require './wrong_hello'
+        wrong_hello 'koko_u'
+
+        # => hello koko_u
+      </pre>
+    </div>
+
+    <div class="slide">
+      <h2>でも実は間違えている</h2>
+      <pre class="brush: ruby">
+        require './wrong_hello'
+        wrong_hello ''
+
+        # => hello
+      </pre>
+      <p>...あれ？ empty girl は？</p>
+    </div>
+
+    <div class="slide">
+      <h2>すごく間違えてる...</h2>
+      <pre class="brush: ruby">
+        require './wrong_hello'
+        wrong_hello nil
+
+        # => `wrong_hello': undefined method `empty?' for nil:NilClass (NoMethodError)
+      </pre>
+      <p>例外が飛んできたよ！</p>
+    </div>
+
+    <div class="slide">
+      <h2>ささいな typo でも<strong>その行が</strong>実行されるまでエラーが発見できない</h2>
+      <h2 class="incremental">テストするしかないですね</h2>
+    </div>
+
+    <div class="slide">
+      <h2>なぜ Guard + Spork なのか？</h2>
+      <p class="incremental">なるべくストレスなくテストを実行したい</p>
+      <p class="incremental">テスト結果が notify などで表示されると、なんとなくデキる気がする</p>
       <br />
       <div class="incremental">
       <h2>他の選択肢は</h2>
@@ -125,16 +193,16 @@
         <li>Ruby : 1.9.2-p180</li>
         <li>Rails : 3.1.0</li>
         <li>Testing Framework : RSpec</li>
-        <li>...</li>
       </ul>
       <br />
       <ul style="list-style:none;">
         <li class="incremental">
-          Mac や Windows の人は自力で頑張って下さい。多分デスクトップ通知の所で使う gem が違うくらい？
-        </li>
+          Mac の人は自力で頑張って下さい。多分 growl に使う gem が違うくらい？
+        </li><br />
+        <li class="incremental">Windows の人はごめんなさい。</li><br />
         <li class="incremental">
           Rails 3.0.x でも動くはず。せっかくリリースされたので 3.1.0 でやりますが、3.1の新機能は一切でてきません。
-        </li>
+        </li><br />
         <li class="incremental">
           Testing Framework は RSpec。Test::Unit でも gem を差し替えるなどすればできるはずですが、時間がなくてフォローできませんでした。
         </li>
@@ -169,7 +237,7 @@ $ rails new guard_demo -T --skip-bundle
           Testing Framework をデフォルトの Test::Unit ではなく RSpec に差し替えるので、-T オプションで test ディレクトリの作成を抑止しています
         </li>
         <li>
-          Rails 3.1.0 から自動的に bundle install されてしまうので、これも抑止しています。さもないと『このハンズオンのせいて、私の環境がぁ〜』と悶絶する可能性があります
+          Rails 3.1.0 から自動的に bundle install されてしまうので、これも抑止しています。<br />Gemfile を修正して bundle install するので、このタイミングですることないんじゃ？
         </li>
       </ul>
     </div>
@@ -196,7 +264,7 @@ group :test, :development do
   gem 'guard-rspec'
   gem 'guard-spork'
   gem 'rb-fsevent'  
-  gem 'growl-notify'
+  gem 'growl_notify'
 end
       </pre>
     </div>
@@ -255,7 +323,7 @@ $ rails generate scaffold Article name:string title:string content:text
       <h2>サンプルとする Rails プロジェクトを作成します(6/6)</h2>
       <p>データベースを作って</p>
       <pre class="box">
-$ rake db:migrate
+$ rake db:migrate RAILS_ENV=test
       </pre>
       <p>テストが動くことを確認</p>
       <pre class="box">
@@ -418,7 +486,7 @@ describe Article do
 end
       </pre>
       <p>自動的に実行されて、テスト失敗しましたか？</p>
-      <p class="incremental">RSpec の書き方？そのうち誰かがセッションするんじゃないっすかね。</p>
+      <p class="incremental">RSpec の書き方はこちらでどうぞ <a href="http://developer.aiming-inc.com/rails/rspec-references/">RSpec を使い始める人が読むべき N 個のドキュメント</a> </p>
     </div>
 
     <div class="slide">
@@ -431,6 +499,7 @@ class Article < ActiveRecord::Base
 end
       </pre>
       <p>やはりテストが自動的に実行され、今度はパスしましたか？</p>
+      <p class="incremental">モデルのテストしかしていないことに注意して下さい。全部のテストを実行(エンターするだけ)するとコントローラ側でエラーになっていることがわかります</p>
     </div>
 
     <div class="slide">
@@ -455,12 +524,10 @@ end
     </div>
 
     <div class="slide">
-      <h2>その他の Guard-XXX シリーズで使ってみたもの</h2>
+      <h2>その他便利そうな Guard-xxx</h2>
       <dl>
         <dt>guard-annotate</dt>
         <dd>モデルのスキーマを変更すると、自動的にモデルクラスにその内容をコメントとして書いてくれる</dd>
-        <dt>guard-rails</dt>
-        <dd>config/routes.rb などを修正すると、自動的に rails server を再起動してくれる</dd>
         <dt>guard-livereload</dt>
         <dd>ビューが変更された時に、自動的にブラウザでページをリロードしてくれる。あらかじめ、chrome などにadd-onを追加しておく必要あり</dd>
       </dl>
@@ -469,24 +536,13 @@ end
 
     <div class="slide">
       <h2>課題</h2>
-      <p class="incremental">guard のバージョンについて</p>
-      <ul class="incremental">
-        <li>guard のバージョンは 0.6.7 を使用しました。github では 0.7系が開発中のようです</li>
-        <li>0.7系では、guard サーバーに対して Ctrl+C などのシグナルを送る方式が変更になります</li>
-        <li>でも guard-spork や guard-rails はまだ追随できていないみたい。まだ使わないほうが無難でしょう</li>
-        <li>0.7系では callback によって開始時や終了時の動きを細かく制御する方針らしい</li>
-      </ul>
       <p class="incremental">Guardfile の修正について</p>
       <ul class="incremental">
         <li>結局自動的に作成された Guardfile を修正することなくここまで来ました</li>
         <li>監視ファイルを増やしたり、変更したい場合は適当に修正しましょう</li>
-        <li>(例)guard-rails では config 配下が変更になると必ずサーバーが再起動してしまいます。<br />watch(%r{^(config|lib)/(?!locales).*}) などと変更するといいでしょう</li>
       </ul>
-    </div>
-
-    <div class="slide">
-      <h2>Spork の設定</h2>
-      <ul>
+      <p class="incremental">Spork の設定</p>
+      <ul class="incremental">
         <li>spork の設定も全然変更していません</li>
         <li>実際には Spork.each_run { } に適当に設定を追加する必要がありましょう</li>
         <li>詳細は<a href="http://curiosity-drives.me/programming/rails/rails3-rspec2-spork-guard-guard-rspec-guard-cucumber-bdd/">さっきの参考サイト</a>を見てね</li>
@@ -496,9 +552,6 @@ end
 
     <div class="slide" data-layout="alt">
       <span style="font-size:xx-large;"> おしまい</span>
-    </div>
-    <div class="slide">
-      <img src="" class="" alt="" />
     </div>
     
     <div class="layout" data-name="default">
